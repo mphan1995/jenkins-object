@@ -1,7 +1,8 @@
 services:
   jenkins:
     container_name: jenkins
-    image: jenkins/jenkins:lts
+    build: .            # <— thêm dòng này (thư mục có Dockerfile)
+    image: my-jenkins:lts-dockercli
     user: root
     ports:
       - "8080:8080"
@@ -12,13 +13,11 @@ services:
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=true
     restart: unless-stopped
-
   registry:
     container_name: registry
     image: registry:2
     ports:
       - "5000:5000"
     restart: unless-stopped
-
 volumes:
   jenkins_home:
