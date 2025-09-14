@@ -1,0 +1,30 @@
+---
+- name: Deploy Flask app container from local registry
+  hosts: docker_host
+  gather_facts: false
+  vars:
+    registry: "localhost:5000"
+    image_name: "jenkins-lab-app"
+    image_tag: "{{ lookup('env','IMAGE_TAG') | default('latest', true) }}"
+    full_image: "{{ registry }}/{{ image_name }}:{{ image_tag }}"
+    container_name: "jenkins-lab-app"
+
+  tasks:
+    - name: Ensure community.docker collection present
+      ansible.builtin.ansible_galaxy:
+        command: install
+        name: community.docker
+      changed_when: false
+
+    - name: Pull image
+      community.docker.docker_image:
+        name: "{{ full_image }}"
+        source: pull
+
+    - name: Run/Update container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ full_image }}"
+        restart_policy: unless-stopped
+        published_ports:
+          - "8000:8000"
