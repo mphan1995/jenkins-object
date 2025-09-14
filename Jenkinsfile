@@ -23,10 +23,10 @@ pipeline {
     stage('Unit Tests') {
       steps {
         sh '''
-          ${PYTHON} -m venv .venv
-          . .venv/bin/activate
-          pip install -r app/requirements.txt pytest
-          pytest -q
+          docker run --rm -v "$PWD":/w -w /w python:3.11-slim bash -lc "
+            python -m pip install --upgrade pip &&
+            pip install -r app/requirements.txt pytest &&
+            pytest -q
         '''
       }
     }
